@@ -1,34 +1,59 @@
-import { useState } from 'react'
-import './App.css'
+import { useEffect } from "react";
+import "./App.css";
+import { useCounterStore, useMessageStore } from "./store";
+
+function setLog() {
+  useCounterStore.setState({ count: 3 });
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { count } = useCounterStore((state) => state);
+  const { message } = useMessageStore((state) => state);
 
-  function increase() {
-    setCount(count + 1)
-  }
-
-  function decrease() {
-    setCount(count - 1)
-  }
-
-  return <OtherComponent count={count} increase={increase} decrease={decrease} />
+  return <OtherComponent count={count} message={message} />;
 }
 
-type OtherType = {
+const OtherComponent = ({
+  count,
+  message,
+}: {
   count: number;
-  increase: () => void;
-  decrease: () => void;
-}
+  message: string;
+}) => {
+  const incrementAsync = useCounterStore((state) => state.incrementAsync);
+  const decrement = useCounterStore((state) => state.decrement);
 
-const OtherComponent = ({ count, increase, decrease }: OtherType) => {
+  const firstChange = useMessageStore((state) => state.firstChange);
+  const secondChange = useMessageStore((state) => state.secondChange);
+
+  useEffect(() => {
+    setLog();
+  }, []);
+
   return (
     <>
       <h1>{count}</h1>
-      <button onClick={increase}>+</button>
-      <button onClick={decrease}>-</button>
+      <div>
+        <button onClick={incrementAsync}>Increment</button>
+        <button onClick={decrement}>Decrement</button>
+      </div>
+      <h3>{message}</h3>
+      <div>
+        <button
+          className={`${message === "ualeikum" ? "custom-style" : ""}`}
+          onClick={firstChange}
+        >
+          Change me
+        </button>
+        <button
+          className={`${message === "salam" ? "custom-style" : ""}`}
+          onClick={secondChange}
+        >
+          Change me
+        </button>
+      </div>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
